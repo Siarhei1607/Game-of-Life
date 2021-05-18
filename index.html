@@ -33,30 +33,41 @@
     const heightInput = document.getElementById("heightInput");
     const count = document.getElementById('count');
     let width, height, sizeFieldWidth, sizeFieldHeight;
-
     const sizeCellwidth = 10;
     const sizeCellheight = 10;
-
     let mas = [];
     let timer;
+    let maxWidth = 1300;
+    let maxHeight = 1300;
 
     canvas.onclick = function(event) {
         let x = event.offsetX;
         let y = event.offsetY;
         x = Math.floor(x / sizeCellwidth);
         y = Math.floor(y / sizeCellheight);
-        mas[y][x] = 1;
+        if(mas[y][x] !== 1){
+            mas[y][x] = 1
+        }else{mas[y][x] = 0
+        }
         drawField();
     };
 
     function resizeCanvas() {
-        canvas.width = widthInput.value;
-        canvas.height = heightInput.value;
-        width = canvas.width;
-        height = canvas.height;
+        width = Math.min(widthInput.value, maxWidth);
+        height = Math.min(heightInput.value, maxHeight);
+        let str = "";
+        if(width === maxWidth) str += ` Установлена максимальная ширина поля игры ${maxWidth}`
+        if(height === maxHeight) str += ` Установлена максимальная высота поля игры ${maxHeight}`
+        if(str) alert(str);
+        width = Math.trunc(width/sizeCellwidth) * sizeCellwidth;
+        height = Math.trunc(height/sizeCellheight) * sizeCellheight;
+        canvas.width = widthInput.value = width;
+        canvas.height = heightInput.value = height;
         sizeFieldWidth = width / sizeCellwidth;
         sizeFieldHeight = height / sizeCellheight;
+
         goLife();
+
     }
 
     function goLife() {
@@ -101,10 +112,7 @@
                     return a + num;
                 }, 0);
                 neighbors = [-1, 1].reduce((a, b) => a += mas[i][j + b] !== undefined && mas[i][j + b], neighbors);
-                mas2[i][j] = +(neighbors === 2 || neighbors === 3)
-
-
-
+                mas2[i][j] = +(neighbors === 3 || (mas[i][j] && neighbors === 2));
             }
         }
         mas = mas2;
@@ -112,7 +120,7 @@
         count.innerHTML++;
         timer = setTimeout(startLife, 300);
     }
-
+    
     function pauseLife() {
         clearInterval(timer)
     }
@@ -123,12 +131,10 @@
         drawField();
         count.innerHTML = 0;
     }
-
     document.getElementById("create").onclick = resizeCanvas;
     document.getElementById("start").onclick = startLife;
     document.getElementById("pause").onclick = pauseLife;
     document.getElementById("stop").onclick = stopLife;
-
 </script>
 </body>
 
